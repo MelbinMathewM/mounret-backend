@@ -1,0 +1,6 @@
+@mounret_HostAddress = http://localhost:5234
+
+GET {{mounret_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

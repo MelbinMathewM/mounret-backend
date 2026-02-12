@@ -1,0 +1,11 @@
+using Mounret.API.Models;
+
+namespace Mounret.API.Interfaces
+{
+    public interface ICategoryRepository
+    {
+        Task<IEnumerable<Category>> GetAllAsync();
+        Task<Category?> GetByIdAsync(int id);
+        Task<Category> AddAsync(Category category);
+    }
+}
