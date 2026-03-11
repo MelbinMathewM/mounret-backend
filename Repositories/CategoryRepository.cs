@@ -30,5 +30,18 @@ namespace Mounret.API.Repositories
             await _context.SaveChangesAsync();
             return category;
         }
+
+        public async Task<Category> UpdateAsync(Category category)
+        {
+            _context.Categories.Update(category);
+            await _context.SaveChangesAsync();
+            return category;
+        }
+
+        public async Task DeleteAsync(Category category)
+        {
+            _context.Categories.Remove(category);
+            await _context.SaveChangesAsync();
+        }
     }
 }

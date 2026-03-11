@@ -25,6 +25,21 @@ namespace Mounret.API.Services
             });
         }
 
+        public async Task<CategoryDto?> GetByIdAsync(int id)
+        {
+            var category = await _repository.GetByIdAsync(id);
+
+            if (category == null)
+                return null;
+
+            return new CategoryDto
+            {
+                Id = category.Id,
+                Name = category.Name,
+                Description = category.Description
+            };
+        }
+
         public async Task<CategoryDto> CreateAsync(CreateCategoryDto dto)
         {
             var category = new Category
@@ -41,6 +56,38 @@ namespace Mounret.API.Services
                 Name = created.Name,
                 Description = created.Description
             };
+        }
+
+        public async Task<CategoryDto?> UpdateAsync(int id, CreateCategoryDto dto)
+        {
+            var category = await _repository.GetByIdAsync(id);
+
+            if (category == null)
+                return null;
+
+            category.Name = dto.Name;
+            category.Description = dto.Description;
+
+            var updated = await _repository.UpdateAsync(category);
+
+            return new CategoryDto
+            {
+                Id = updated.Id,
+                Name = updated.Name,
+                Description = updated.Description
+            };
+        }
+
+        public async Task<bool> DeleteAsync(int id)
+        {
+            var category = await _repository.GetByIdAsync(id);
+
+            if (category == null)
+                return false;
+
+            await _repository.DeleteAsync(category);
+
+            return true;
         }
     }
 }
