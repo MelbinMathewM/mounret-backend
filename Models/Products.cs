@@ -8,9 +8,17 @@ namespace Mounret.API.Models
 
         [Required]
         [MaxLength(200)]
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         public string? Description { get; set; }
+
+        public string? Image { get; set; }
+
+        public string? Dimensions { get; set; }
+
+        public string? Material { get; set; }
+
+        public string? AdditionalInfo { get; set; }
 
         [Required]
         public decimal Price { get; set; }
@@ -19,12 +27,15 @@ namespace Mounret.API.Models
 
         public bool IsActive { get; set; } = true;
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
         public bool IsDeleted { get; set; } = false;
 
-        // Foreign Key
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        // FK
         public int CategoryId { get; set; }
         public Category Category { get; set; }
+
+        public int BrandId { get; set; }
+        public Brand Brand { get; set; }
     }
 }

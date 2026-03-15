@@ -17,21 +17,15 @@ namespace Mounret.API.Controllers
             _service = service;
         }
 
-        [HttpPost("register")]
-        public async Task<IActionResult> Register(RegisterDto dto)
-        {
-            var token = await _service.RegisterAsync(dto);
-            return Ok(new { token });
-        }
-
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto dto)
         {
-            var token = await _service.LoginAsync(dto);
-            if (token == null)
-                return Unauthorized();
+            var result = await _service.LoginAsync(dto);
 
-            return Ok(new { token });
+            if (result is null)
+                return Unauthorized("Invalid credentials");
+
+            return Ok(result);
         }
 
         [Authorize]
@@ -40,19 +34,12 @@ namespace Mounret.API.Controllers
         {
             var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            if (string.IsNullOrEmpty(userIdClaim))
-                return Unauthorized();
-
             if (!int.TryParse(userIdClaim, out var userId))
                 return Unauthorized();
 
             var profile = await _service.GetProfileAsync(userId);
 
-            if (profile == null)
-                return NotFound();
-
             return Ok(profile);
         }
-
     }
 }

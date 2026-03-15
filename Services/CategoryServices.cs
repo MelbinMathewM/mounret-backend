@@ -7,10 +7,12 @@ namespace Mounret.API.Services
     public class CategoryService : ICategoryService
     {
         private readonly ICategoryRepository _repository;
+        private readonly IWebHostEnvironment _env;
 
-        public CategoryService(ICategoryRepository repository)
+        public CategoryService(ICategoryRepository repository, IWebHostEnvironment env)
         {
             _repository = repository;
+            _env = env;
         }
 
         public async Task<IEnumerable<CategoryDto>> GetAllAsync()
@@ -21,7 +23,7 @@ namespace Mounret.API.Services
             {
                 Id = c.Id,
                 Name = c.Name,
-                Description = c.Description
+                Image = c.Image
             });
         }
 
@@ -36,16 +38,37 @@ namespace Mounret.API.Services
             {
                 Id = category.Id,
                 Name = category.Name,
-                Description = category.Description
+                Image = category.Image
             };
         }
 
         public async Task<CategoryDto> CreateAsync(CreateCategoryDto dto)
         {
+            string imagePath = "";
+
+            if (dto.Image != null)
+            {
+                var uploads = Path.Combine(_env.WebRootPath, "uploads/categories");
+
+                if (!Directory.Exists(uploads))
+                    Directory.CreateDirectory(uploads);
+
+                var fileName = Guid.NewGuid() + Path.GetExtension(dto.Image.FileName);
+
+                var filePath = Path.Combine(uploads, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await dto.Image.CopyToAsync(stream);
+                }
+
+                imagePath = $"/uploads/categories/{fileName}";
+            }
+
             var category = new Category
             {
                 Name = dto.Name,
-                Description = dto.Description
+                Image = imagePath
             };
 
             var created = await _repository.AddAsync(category);
@@ -54,7 +77,7 @@ namespace Mounret.API.Services
             {
                 Id = created.Id,
                 Name = created.Name,
-                Description = created.Description
+                Image = created.Image
             };
         }
 
@@ -66,7 +89,25 @@ namespace Mounret.API.Services
                 return null;
 
             category.Name = dto.Name;
-            category.Description = dto.Description;
+
+            if (dto.Image != null)
+            {
+                var uploads = Path.Combine(_env.WebRootPath, "uploads/categories");
+
+                if (!Directory.Exists(uploads))
+                    Directory.CreateDirectory(uploads);
+
+                var fileName = Guid.NewGuid() + Path.GetExtension(dto.Image.FileName);
+
+                var filePath = Path.Combine(uploads, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await dto.Image.CopyToAsync(stream);
+                }
+
+                category.Image = $"/uploads/categories/{fileName}";
+            }
 
             var updated = await _repository.UpdateAsync(category);
 
@@ -74,7 +115,7 @@ namespace Mounret.API.Services
             {
                 Id = updated.Id,
                 Name = updated.Name,
-                Description = updated.Description
+                Image = updated.Image
             };
         }
 

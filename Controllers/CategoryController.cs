@@ -18,8 +18,6 @@ namespace Mounret.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            Console.WriteLine("GET /api/categories called");
-            
             var result = await _service.GetAllAsync();
             return Ok(result);
         }
@@ -36,14 +34,14 @@ namespace Mounret.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateCategoryDto dto)
+        public async Task<IActionResult> Create([FromForm] CreateCategoryDto dto)
         {
             var result = await _service.CreateAsync(dto);
             return Ok(result);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, CreateCategoryDto dto)
+        public async Task<IActionResult> Update(int id, [FromForm] CreateCategoryDto dto)
         {
             var result = await _service.UpdateAsync(id, dto);
 

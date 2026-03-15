@@ -18,6 +18,8 @@ namespace Mounret.API.Repositories
         {
             return await _context.Products
                 .Include(p => p.Category)
+                .Include(p => p.Brand)
+                .Where(p => !p.IsDeleted)
                 .ToListAsync();
         }
 
@@ -25,7 +27,8 @@ namespace Mounret.API.Repositories
         {
             return await _context.Products
                 .Include(p => p.Category)
-                .FirstOrDefaultAsync(p => p.Id == id);
+                .Include(p => p.Brand)
+                .FirstOrDefaultAsync(p => p.Id == id && !p.IsDeleted);
         }
 
         public async Task<Product> AddAsync(Product product)
@@ -35,33 +38,35 @@ namespace Mounret.API.Repositories
             return product;
         }
 
+        public async Task UpdateAsync(Product product)
+        {
+            _context.Products.Update(product);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<(IEnumerable<Product>, int)> GetPagedAsync(
             int page,
             int pageSize,
             int? categoryId,
+            int? brandId,
             string? search,
             string? sortBy)
         {
             var query = _context.Products
                 .Include(p => p.Category)
+                .Include(p => p.Brand)
                 .Where(p => !p.IsDeleted)
                 .AsQueryable();
 
-            // 🔎 Search
             if (!string.IsNullOrWhiteSpace(search))
-            {
-                query = query.Where(p =>
-                    p.Name.Contains(search));
-            }
+                query = query.Where(p => p.Name.Contains(search));
 
-            // 📂 Filter by category
             if (categoryId.HasValue)
-            {
-                query = query.Where(p =>
-                    p.CategoryId == categoryId.Value);
-            }
+                query = query.Where(p => p.CategoryId == categoryId.Value);
 
-            // 🔃 Sorting
+            if (brandId.HasValue)
+                query = query.Where(p => p.BrandId == brandId.Value);
+
             query = sortBy?.ToLower() switch
             {
                 "name_asc" => query.OrderBy(p => p.Name),
@@ -79,12 +84,6 @@ namespace Mounret.API.Repositories
                 .ToListAsync();
 
             return (products, totalCount);
-        }
-
-        public async Task UpdateAsync(Product product)
-        {
-            _context.Products.Update(product);
-            await _context.SaveChangesAsync();
         }
     }
 }

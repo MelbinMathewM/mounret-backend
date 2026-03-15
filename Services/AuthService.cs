@@ -21,43 +21,30 @@ namespace Mounret.API.Services
             _configuration = configuration;
         }
 
-        public async Task<string> RegisterAsync(RegisterDto dto)
-        {
-            var existingUser = await _context.Users
-                .FirstOrDefaultAsync(x => x.Email == dto.Email);
-
-            if (existingUser != null)
-                throw new Exception("Email already exists");
-
-            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(dto.Password);
-
-            var user = new User
-            {
-                Name = dto.Name,
-                Email = dto.Email,
-                PasswordHash = hashedPassword,
-                Role = "Customer"
-            };
-
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            return GenerateJwtToken(user);
-        }
-
-        public async Task<string?> LoginAsync(LoginDto dto)
+        public async Task<AuthResponseDto?> LoginAsync(LoginDto dto)
         {
             var user = await _context.Users
                 .FirstOrDefaultAsync(x => x.Email == dto.Email);
 
+            Console.WriteLine(user);
+
             if (user == null)
                 return null;
 
-            var isValid = BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash);
-            if (!isValid)
+            var valid = BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash);
+
+            if (!valid)
                 return null;
 
-            return GenerateJwtToken(user);
+            var token = GenerateJwtToken(user);
+
+            return new AuthResponseDto
+            {
+                Token = token,
+                Name = user.Name,
+                Email = user.Email,
+                Role = user.Role
+            };
         }
 
         public async Task<UserProfileDto?> GetProfileAsync(int userId)

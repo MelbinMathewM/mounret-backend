@@ -8,13 +8,13 @@ namespace Mounret.API.Models
 
         [Required]
         [MaxLength(150)]
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
-        public string? Description { get; set; }
+        public string Image { get; set; } = string.Empty;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        // Navigation property
         public ICollection<Product>? Products { get; set; }
+        
     }
 }
