@@ -15,7 +15,7 @@ namespace Mounret.API.Controllers
             _service = service;
         }
 
-        
+
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -29,6 +29,5 @@ namespace Mounret.API.Controllers
             var result = await _service.CreateAsync(dto);
             return Ok(result);
         }
-
     }
 }

@@ -20,6 +20,8 @@ builder.Services.AddCors(options =>
         });
 });
 
+builder.Services.AddMemoryCache();
+
 builder.Services.AddControllers();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(
@@ -37,6 +39,7 @@ builder.Services.AddScoped<IBrandRepository, BrandRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IEnquiryService, EnquiryService>();
+builder.Services.AddScoped<ChatService>();
 builder.Services.Configure<EmailSettings>(
     builder.Configuration.GetSection("EmailSettings"));
 
